@@ -1,7 +1,7 @@
 # Bridge Parameters
 
 The files in this directory exist to bridge the gap between the `qSlicerCLIModuleUIHelper`,
-written in C++ and the Python code of the pipeline creator.
+written in C++ and the Python code of the Pipeline Creator, specifically for the CLIModuleWrapping.
 
 The bridge parameters are classes derived from QObject that meet the interface expected by the pipeline creator for pipeline parameters (two functions: `GetValue() -> SomeValueType` and `GetUI() -> QWidget or QLayout`). They are C++ classes wrapped by the Qt Python wrapping mechanism in CMake. The bridge factory creates the appropriate bridge parameter type for a CLI parameter.
 
@@ -11,11 +11,7 @@ At the time of this implementation, there are 2 ways of Python wrapping C++ code
 
 ## Why doesn't the qSlicerPipelineCLIModulesBridgeParameter base class offer any kind of interface to use it? Why have it at all?
 
-The bridge parameters and bridge factory are in an interesting spot. They are C++ code that is solely intended to be used by Python code. C++ requires that function signatures cannot vary only in return type, hence returning a base class. Multiple functions "`CreateIntegerParameterWrapper/CreateFloatParameterWrapper/etc`" were not desired since the whole point of the factory was to decide on and create the correct the parameter type. But the interaction between the C++ type system and the Python type system is interesting. Python doesn't have the concept of "downcasting". You always have access to the most derived type's interface. So when I return a base class in C++, I actually "get" the derived class in Python. So I end up with one C++ function capable of returning different types to Python code, no casting required.
-
-## Why does the factory keep ownership of the parameters?
-
-When I returned a raw owning pointer, the generated Python wrapping never deleted it. When I returned a `QSharedPointer` I got errors at runtime saying Python didn't know what a `QSharedPointer<qSlicerPipelineCLIModulesBridgeParameter>` was. Because the factory owns and deletes the bridge parameters, the bridge parameters cannot outlive the factory. Ensuring this is the purpose of the Python class `CLIModuleWrapping.BridgeParameterWrapper` and the reason behind the "yet another" wrapper class.
+The bridge parameters and bridge factory are in an interesting spot. They are C++ code that is solely intended to be used by Python code. C++ requires that function signatures cannot vary only in return type, hence returning a base class. Multiple functions "`CreateIntegerParameterWrapper/CreateFloatParameterWrapper/etc`" were not desired since the whole point of the factory was to decide on and create the correct parameter type. But the interaction between the C++ type system and the Python type system is interesting. Python doesn't have the concept of "downcasting". You always have access to the most derived type's interface. So when I return a base class in C++, I actually "get" the derived class in Python. So I end up with one C++ function capable of returning different types to Python code, no casting required.
 
 ## Other notes:
 
