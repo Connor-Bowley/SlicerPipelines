@@ -234,6 +234,23 @@ class PipelineCreatorUtilTests(unittest.TestCase):
 
         self.assertEqual(_SomeClass, eval(typeAsCode(_SomeClass)))
 
+    def test_smartCopy_outputPack_no_nodes(self) -> None:
+        from _PipelineCreator.ItemsRequiredByGeneratedCode import smartCopy
+
+        @parameterPack
+        class OutputPack:
+            i: int
+            f: float
+            b: bool
+            s: str
+            li: list[int]
+
+        from_ = OutputPack(2, 3.3, True, "hi", [3, 3])
+        to = OutputPack()
+        smartCopy(from_, to)
+
+        self.assertEqual(to, OutputPack(2, 3.3, True, "hi", [3, 3]))
+
 
 class PipelineCreatorRegistrationTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -1082,7 +1099,6 @@ class PipelineCreatorFullTests(unittest.TestCase):
             widget.runButton.click()
 
             self.assertEqual(outputSeg.GetSegmentation().GetNumberOfSegments(), 1)
-            # TODO: Enable this line once reference propagation is fixed
             # self.assertEqual(outputSeg.GetNodeReference(outputSeg.GetReferenceImageGeometryReferenceRole()), outputVol)
 
             # make sure there are no intermediate results hanging.

@@ -6,6 +6,7 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
 
   _${MODULE_NAME}/PipelineRegistrar.py
+  _${MODULE_NAME}/ItemsRequiredByGeneratedCode.py
 
   _${MODULE_NAME}/PipelineCreation/__init__.py
   _${MODULE_NAME}/PipelineCreation/core.py
